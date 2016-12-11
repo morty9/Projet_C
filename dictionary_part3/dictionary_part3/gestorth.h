@@ -46,7 +46,7 @@ int getClosedLength(char* aString, char* fileName);
 char** getCLosedWords(char* fileName, char* string, int);
 void displayCLosedWordsForEach(char**array, int size, char* fileName, char* dictionary);
 int howManyOccurances(char**, int,char*);
-void removeOccurances(char**, int);
+void removeOccurances(char**, int, char*);
 int my_strlen(char*);
 
 LinkedList* newElement(char*);

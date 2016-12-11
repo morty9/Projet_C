@@ -440,7 +440,7 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     int i = 0;
     int create = 0;
     char * wordsToPut = malloc(sizeof(char)*255);
-    char** arrayFile;
+    char** array;
     int size = 0;
     
     do {
@@ -497,8 +497,9 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     fclose(import);
     
     size = fileLength(importName);
-    arrayFile = fillArray(importName, size);
-    removeOccurances(arrayFile, size);
+    array = fillArray(importName, size);
+    
+    removeOccurances(array, size, importName);
     
     menu2(importName, dictionary, dictionarys, importFile);
     free(wordsToPut);
@@ -516,7 +517,7 @@ char** searchMissingWords(char* name, char* dictionary, LinkedList* dictionaryLi
     char** arrayDictio = fillArray(dictionary,dicoSize);
     char** result = malloc(sizeof(char*));
     
-    //result = getMissingWords(arrayText, fileSize, arrayDictio, dicoSize);
+    result = getMissingWords(arrayText, fileSize, arrayDictio, dicoSize);
     
     return result;
 }
@@ -646,17 +647,18 @@ void displayCLosedWordsForEach(char**array, int size, char* fileName, char* dict
             printArray(res, nbrOfClosedWords);
             if(file && correction) {
                 while(fgets(words, 255, file) != '\0') {
-                    //s += strlen(words);
+                    s += strlen(words);
                     words[strcspn(words, "\n")] = '\0';
                     if(strcmp(words, array[i]) == 0) {
-                        //fseek(correction, s, SEEK_SET);
+                        file = fopen(fileName, "a+");
+                        fseek(file, s, SEEK_SET);
                         for (int j = 0; res[j] ; j++) {
-                            words[strcspn(words, "\n")] = '\0';
                             if(my_strcmp(words, res[j]) == 1) {
-                                fputs(res[j], correction);
+                                fputs(res[j], file);
                             }
                         }
                     }
+                    fseek(file, 0, SEEK_SET);
                 }
             }
             //fputs(res[j],correction);
@@ -745,10 +747,13 @@ int howManyOccurances(char** array, int size,char* string){
 }
 
 
-void removeOccurances(char** array, int size){
+void removeOccurances(char** array, int size, char* name){
     int i = 0;
+    int k = 0;
+    int count = 0;
+
     while (i < size) {
-        if(howManyOccurances(array, size, array[i]) >= 2){
+        while(howManyOccurances(array, size, array[i]) >= 2){
             int j;
             for(j = i; j < size; j++){
                 array[j] = array[j+1];
@@ -757,6 +762,7 @@ void removeOccurances(char** array, int size){
         }
         i++;
     }
+    
     printf("Here's the new array with occurances removed\n");
     printArray(array, size);
 }
