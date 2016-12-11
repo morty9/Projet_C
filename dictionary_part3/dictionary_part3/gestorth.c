@@ -683,4 +683,61 @@ int getClosedLength(char* aString, char* fileName){
 }
 
 
+int howManyOccurances(char** array, int size,char* string){
+    int ocurance = 0;
+    int i;
+    
+    int wordToBeCompared = my_strlen(string);
+    
+    int wordFromArraySize = 0;
+    
+    char* temp = malloc(sizeof(char)*255);
+    
+    for(i = 0; i < size; i++){
+        
+        strcpy(temp,array[i]);
+        
+        wordFromArraySize =  my_strlen(temp);
+        
+        if(wordFromArraySize > wordToBeCompared){
+            if(!strncmp(string, array[i], wordFromArraySize)){
+                ocurance++;
+            }
+        }
+        else{
+            if(!strncmp(string, array[i], wordToBeCompared)){
+                ocurance++;
+            }
+        }
+    }
+    return ocurance;
+}
+
+
+void removeOccurances(char** array, int size){
+    int i = 0;
+    while (i < size) {
+        if(howManyOccurances(array, size, array[i]) >= 2){
+            int j;
+            for(j = i; j < size; j++){
+                array[j] = array[j+1];
+            }
+            size--;
+        }
+        i++;
+    }
+    printf("Here's the new array with occurances removed\n");
+    printArray(array, size);
+}
+
+int my_strlen(char* aString){
+    int res = 0;
+    
+    do {
+        res++;
+    } while (aString[res] != '\0');
+    
+    return res;
+}
+
 

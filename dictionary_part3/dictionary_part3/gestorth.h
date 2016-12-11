@@ -50,5 +50,8 @@ void displayCLosedWordsForEach(char**array, int size, char* fileName, char* dict
 LinkedList* newElement(char*);
 void printLinkedList(LinkedList*);
 LinkedList* fillList(char*, LinkedList*);
+int howManyOccurances(char**, int,char*);
+void removeOccurances(char**, int);
+int my_strlen(char* aString);
 
 #endif /* gestorth_h */
