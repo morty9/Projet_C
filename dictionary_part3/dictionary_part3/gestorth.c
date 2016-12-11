@@ -407,7 +407,6 @@ char* chooseTextFile(char* dictionary, LinkedList* importFile, LinkedList* dicti
     }while(!found);
     
     free(name);
-    //free(newImportName);
     return newImportName;
 }
 
@@ -441,6 +440,8 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     int i = 0;
     int create = 0;
     char * wordsToPut = malloc(sizeof(char)*255);
+    char** array;
+    int size = 0;
     
     do {
         printf("Enter a name for your new file\n");
@@ -495,10 +496,14 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     
     fclose(import);
     
-    //deleteDuplication(importName);
-    //free(importName);
+    //size = fileLength(importName);
+    //array = fillArray(importName, size);
+    
+    removeOccurances(importName);
+    
     menu2(importName, dictionary, dictionarys, importFile);
     free(wordsToPut);
+    free(importName);
     
     return importName;
 }
@@ -507,13 +512,11 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
 char** searchMissingWords(char* name, char* dictionary, LinkedList* dictionaryList, LinkedList* importFile) {
     
     int dicoSize = fileLength(dictionary);
-    int fileSize;
-    char** arrayText;
+    int fileSize = fileLength(name);
+    char** arrayText = fillArray(name,fileSize);
     char** arrayDictio = fillArray(dictionary,dicoSize);
     char** result = malloc(sizeof(char*));
     
-    fileSize = fileLength(name);
-    arrayText = fillArray(name,fileSize);
     result = getMissingWords(arrayText, fileSize, arrayDictio, dicoSize);
     
     return result;
@@ -527,6 +530,9 @@ void searchMissingWordsAndTreshold(char* import, char* dictionary, LinkedList* d
     char** arrayText = fillArray(import,fileSize);
     
     missingWordsWithThreshold(arrayText, fileSize, arrayDictio, dicoSize, import, dictionary);
+    
+    free(arrayText);
+    free(arrayDictio);
     
 }
 
@@ -545,7 +551,7 @@ char** fillArray(char* filename,int size){
             
             
             if(i < size){
-                array[i] = malloc(sizeof(char));
+                array[i] = malloc(sizeof(char)*255);
                 strcpy(array[i],wordFromFile);
             }
             i++;
@@ -566,7 +572,7 @@ char** getMissingWords(char** arrayText, int textFileSize, char** arrayDictio, i
     int line = 0;
     int lineCounter = 0;
     int i = 0;
-    char** result= malloc(sizeof(char*));
+    char** result= malloc(sizeof(char*) * textFileSize);
     
     printf("\n\nHere's a missing word:\n");
     
@@ -579,7 +585,11 @@ char** getMissingWords(char** arrayText, int textFileSize, char** arrayDictio, i
         }
         i++;
     }
-
+    
+    for(int i = 0; result[i]; i++) {
+        printf("%s\n",result[i]);
+    }
+    
     return result;
 }
 
@@ -597,44 +607,68 @@ void printArray(char**array, int size){
 void missingWordsWithThreshold(char** arrayText, int textFileSize, char** arrayDictio, int dictioSize, char* import, char* dictionary){
 
     int size = 0;
-    char** result = malloc(sizeof(char*) * textFileSize);
+    int i;
+    char** arrayMissing = malloc(sizeof(char*) * textFileSize);
 
-    result = getMissingWords(arrayText, textFileSize, arrayDictio, dictioSize);
+    arrayMissing = getMissingWords(arrayText, textFileSize, arrayDictio, dictioSize);
     
-    for (int i = 0; result[i] ; i++) {
-        size++;
+    for (i = 0; arrayMissing[i] ; i++) {
+        printf("%s\n",arrayMissing[i]);
+        
     }
     
-    displayCLosedWordsForEach(result, size, import, dictionary);
+    for (i = 0; arrayMissing[i] ; i++) {
+        size++;
+    }
+
+    displayCLosedWordsForEach(arrayMissing, size, import, dictionary);
     
 }
 
 
 void displayCLosedWordsForEach(char**array, int size, char* fileName, char* dictionary){
     
-    FILE* correction = fopen(fileName,"r+");
+    FILE* file = fopen(fileName,"r+");
+    FILE* correction = fopen("correction.txt", "a+");
+    
     int j = 0;
     int nbrOfClosedWords = 0;
+    char* words = malloc(sizeof(char)*255);
+    int s = 0;
     
     printf("\n\nList of closed words for each missing word\n\n");
     
     for(int i = 0; i < size; i++){
         
-        nbrOfClosedWords = getClosedLength(array[i], fileName);
+        nbrOfClosedWords = getClosedLength(array[i], dictionary);
         if(nbrOfClosedWords){
-            char** res = getCLosedWords(fileName,array[i], nbrOfClosedWords);
+            char** res = getCLosedWords(dictionary,array[i], nbrOfClosedWords);
             printf("\n\nThe closed words for %s are : \n", array[i]);
             printArray(res, nbrOfClosedWords);
-//            if(correction) {
-//                
-//            }
-            fputs(res[j],correction);
+            if(file && correction) {
+                while(fgets(words, 255, file) != '\0') {
+                    s += strlen(words);
+                    words[strcspn(words, "\n")] = '\0';
+                    if(strcmp(words, array[i]) == 0) {
+                        file = fopen(fileName, "a+");
+                        fseek(file, s, SEEK_SET);
+                        for (int j = 0; res[j] ; j++) {
+                            if(my_strcmp(words, res[j]) == 1) {
+                                fputs(res[j], file);
+                            }
+                        }
+                    }
+                    fseek(file, 0, SEEK_SET);
+                }
+            }
+            //fputs(res[j],correction);
         }else {
             printf("No closed words for %s\n",array[i]);
         }
 
     }
     
+    free(words);
 }
 
 
@@ -680,6 +714,36 @@ int getClosedLength(char* aString, char* fileName){
         fclose(file);
     }
     return closedWords;
+}
+
+int howManyOccurances(char** array, int size,char* string){
+    int ocurance = 0;
+    int i;
+    
+    int wordToBeCompared = my_strlen(string);
+    
+    int wordFromArraySize = 0;
+    
+    char* temp = malloc(sizeof(char)*255);
+    
+    for(i = 0; i < size; i++){
+        
+        strcpy(temp,array[i]);
+        
+        wordFromArraySize =  my_strlen(temp);
+        
+        if(wordFromArraySize > wordToBeCompared){
+            if(!strncmp(string, array[i], wordFromArraySize)){
+                ocurance++;
+            }
+        }
+        else{
+            if(!strncmp(string, array[i], wordToBeCompared)){
+                ocurance++;
+            }
+        }
+    }
+    return ocurance;
 }
 
 
@@ -755,4 +819,44 @@ int my_strlen(char* aString){
     return res;
 }
 
+
+void removeOccurances(char* filename){
+    
+    int fileSize = fileLength(filename);
+    
+    char** array = fillArray(filename,fileSize);
+    
+    int i = 0;
+    while (i < fileSize) {
+        while(howManyOccurances(array, fileSize, array[i]) >= 2){
+            int j;
+            for(j = i; j < fileSize; j++){
+                array[j] = array[j+1];
+            }
+            fileSize--;
+        }
+        i++;
+    }
+    
+    printf("Here's the new array with occurances removed\n");
+    printArray(array, fileSize);
+    
+    FILE* file = fopen(filename, "w+");
+    if(file){
+        for(int j = 0; j < fileSize; j++){
+            fputs(array[j], file);
+            fputs("\n", file);
+        }
+    }
+}
+
+int my_strlen(char* aString){
+    int res = 0;
+    
+    do {
+        res++;
+    } while (aString[res] != '\0');
+    
+    return res;
+}
 

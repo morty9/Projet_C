@@ -224,9 +224,10 @@ void menu2(char* dictionary , LinkedList* dictionaryList) {
     printf("1. Search for a word in the dictionary\n");
     printf("2. Display words in the dictionary\n");
     printf("3. Add a word in the dictionary\n");
-    printf("4. Delete word in the dictionary\n");
-    printf("5. Destroy the dictionary\n");
-    printf("6. Go back to the main menu\n");
+    printf("4. Make a dictionary wit a import file\n");
+    printf("5. Delete word in the dictionary\n");
+    printf("6. Destroy the dictionary\n");
+    printf("7. Go back to the main menu\n");
     
     do {
         scanf("%s",action);
@@ -245,13 +246,16 @@ void menu2(char* dictionary , LinkedList* dictionaryList) {
                 menu2(dictionary,dictionaryList);
                 break;
             case 52:
+                chooseTextFile(dictionary, dictionaryList);
+                menu2(dictionary, dictionaryList);
+            case 53:
                 deleteWord(dictionary);
                 menu2(dictionary, dictionaryList);
                 break;
-            case 53:
+            case 54:
                 deleteDictionary(dictionary,dictionaryList);
                 break;
-            case 54:
+            case 55:
                 menu(dictionaryList);
                 break;
             default:
@@ -507,4 +511,128 @@ void deleteDictionary(char* name, LinkedList* dictionaryList) {
         menu(dictionaryList);
         fclose(dictionary);
     }
+}
+
+//convert capital letters in tiny letters
+void replaceCapital(char *string) {
+    int i = 0;
+    
+    for (i = 0; string[i] != '\0'; i ++)
+    {
+        if (string[i] >= 'A' && string[i] <= 'Z')
+        {
+            string[i] += 'a' - 'A';
+        }
+    }
+}
+
+void chooseTextFile(char* dictionary, LinkedList* dictionarys) {
+    
+    dictionaryList(dictionarys);
+    
+    char* name = malloc(sizeof(char)*255);
+    char* newImportName = malloc(sizeof(char)*255);
+    
+    if(dictionarys->value == NULL) {
+        dictionarys = dictionarys->next;
+    }
+    
+    int found = 0;
+    do {
+        LinkedList* head = dictionarys;
+        printf("\nEnter the name of the file you want to import\n");
+        scanf("%s",name);
+        
+        if(strcmp(name,"\e") == 0) {
+            menu(dictionarys);
+        }
+        
+        strcat(name, ".txt");
+        
+        while(head != NULL && head->value != NULL){
+            if(strcmp(name, head->value) == 0){
+                found = 1;
+                formattingFile(name, dictionary, dictionarys);
+                break;
+            }
+            head = head->next;
+        }
+        
+        if(head == NULL) {
+            printf("This file doesn't exist, please retry\n");
+        }
+        
+    }while(!found);
+    
+    free(name);
+    free(newImportName);
+}
+
+void formattingFile(char* name, char* dictionary, LinkedList* dictionarys) {
+    
+    FILE* import = fopen(name, "r+");
+    FILE* importNew;
+    char* importName = malloc(sizeof(char)*255);
+    char words;
+    int i = 0;
+    int create = 0;
+    char * wordsToPut = malloc(sizeof(char)*255);
+    
+    do {
+        printf("Enter a name for your new file\n");
+        scanf("%s",importName);
+        
+        if(strcmp(importName, "\e") == 0) {
+            chooseTextFile(dictionary, dictionarys);
+        }
+        
+        strcat(importName, ".txt");
+        
+        if(importName != NULL){
+            
+            importNew = fopen(importName,"r+");
+            
+            if(importNew == NULL){
+                importNew = fopen(importName, "a+");
+                create = 1;
+                while ((words = fgetc(import)) != EOF) {
+                    wordsToPut[i] = words;
+                    if((words == 32 || words == 13) && importNew != NULL) {
+                        wordsToPut[i] = '\n';
+                        if (wordsToPut[i-1] >= 33 && wordsToPut[i-1] <= 64 ) {
+                            wordsToPut[i-1] = wordsToPut[i];
+                            wordsToPut[strlen(wordsToPut) - 1] = 0;
+                        }
+                        replaceCapital(wordsToPut);
+                        fputs(wordsToPut, importNew);
+                        char* next = malloc(sizeof(char)*255);
+                        wordsToPut = next;
+                        i = 0;
+                    }else {
+                        i++;
+                    }
+                }
+                printf("You're file have been imported correctly\n");
+                fclose(importNew);
+            }else {
+                fclose(importNew);
+                fclose(import);
+            }
+            
+        }else{
+            printf("Empty names are not allowed\n");
+        }
+        
+        if(!create) {
+            printf("This file already exist, please retry\n");
+        }
+        
+    }while(!create);
+    
+    fclose(import);
+    
+    //deleteDuplication(importName);
+    free(importName);
+    free(wordsToPut);
+    menu2(dictionary, dictionarys);
 }

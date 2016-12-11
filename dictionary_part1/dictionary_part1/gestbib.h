@@ -32,5 +32,8 @@ void addWords(char*, LinkedList*);
 int checkName(char*);
 void deleteDictionary(char*, LinkedList*);
 void deleteWord(char*);
+void chooseTextFile(char*, LinkedList*);
+void formattingFile(char*, char* , LinkedList* );
+void replaceCapital(char *);
 
 #endif /* gestbib_h */
