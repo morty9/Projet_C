@@ -51,7 +51,7 @@ LinkedList* newElement(char*);
 void printLinkedList(LinkedList*);
 LinkedList* fillList(char*, LinkedList*);
 int howManyOccurances(char**, int,char*);
-void removeOccurances(char**, int);
+void removeOccurances(char*);
 int my_strlen(char* aString);
 
 #endif /* gestorth_h */
