@@ -496,10 +496,10 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     
     fclose(import);
     
-    size = fileLength(importName);
-    array = fillArray(importName, size);
+    //size = fileLength(importName);
+    //array = fillArray(importName, size);
     
-    removeOccurances(array, size, importName);
+    removeOccurances(importName);
     
     menu2(importName, dictionary, dictionarys, importFile);
     free(wordsToPut);
@@ -747,24 +747,35 @@ int howManyOccurances(char** array, int size,char* string){
 }
 
 
-void removeOccurances(char** array, int size, char* name){
-    int i = 0;
-    int k = 0;
-    int count = 0;
 
-    while (i < size) {
-        while(howManyOccurances(array, size, array[i]) >= 2){
+void removeOccurances(char* filename){
+    
+    int fileSize = fileLength(filename);
+    
+    char** array = fillArray(filename,fileSize);
+    
+    int i = 0;
+    while (i < fileSize) {
+        while(howManyOccurances(array, fileSize, array[i]) >= 2){
             int j;
-            for(j = i; j < size; j++){
+            for(j = i; j < fileSize; j++){
                 array[j] = array[j+1];
             }
-            size--;
+            fileSize--;
         }
         i++;
     }
     
     printf("Here's the new array with occurances removed\n");
-    printArray(array, size);
+    printArray(array, fileSize);
+    
+    FILE* file = fopen(filename, "w+");
+    if(file){
+        for(int j = 0; j < fileSize; j++){
+            fputs(array[j], file);
+            fputs("\n", file);
+        }
+    }
 }
 
 int my_strlen(char* aString){
