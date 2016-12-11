@@ -717,7 +717,7 @@ int howManyOccurances(char** array, int size,char* string){
 void removeOccurances(char** array, int size){
     int i = 0;
     while (i < size) {
-        if(howManyOccurances(array, size, array[i]) >= 2){
+        while(howManyOccurances(array, size, array[i]) >= 2){
             int j;
             for(j = i; j < size; j++){
                 array[j] = array[j+1];
