@@ -440,6 +440,8 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     int i = 0;
     int create = 0;
     char * wordsToPut = malloc(sizeof(char)*255);
+    char** arrayFile;
+    int size = 0;
     
     do {
         printf("Enter a name for your new file\n");
@@ -494,7 +496,10 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     
     fclose(import);
     
-    //deleteDuplication(importName);
+    size = fileLength(importName);
+    arrayFile = fillArray(importName, size);
+    removeOccurances(arrayFile, size);
+    
     menu2(importName, dictionary, dictionarys, importFile);
     free(wordsToPut);
     free(importName);
@@ -511,7 +516,7 @@ char** searchMissingWords(char* name, char* dictionary, LinkedList* dictionaryLi
     char** arrayDictio = fillArray(dictionary,dicoSize);
     char** result = malloc(sizeof(char*));
     
-    result = getMissingWords(arrayText, fileSize, arrayDictio, dicoSize);
+    //result = getMissingWords(arrayText, fileSize, arrayDictio, dicoSize);
     
     return result;
 }
@@ -709,5 +714,60 @@ int getClosedLength(char* aString, char* fileName){
     return closedWords;
 }
 
+int howManyOccurances(char** array, int size,char* string){
+    int ocurance = 0;
+    int i;
+    
+    int wordToBeCompared = my_strlen(string);
+    
+    int wordFromArraySize = 0;
+    
+    char* temp = malloc(sizeof(char)*255);
+    
+    for(i = 0; i < size; i++){
+        
+        strcpy(temp,array[i]);
+        
+        wordFromArraySize =  my_strlen(temp);
+        
+        if(wordFromArraySize > wordToBeCompared){
+            if(!strncmp(string, array[i], wordFromArraySize)){
+                ocurance++;
+            }
+        }
+        else{
+            if(!strncmp(string, array[i], wordToBeCompared)){
+                ocurance++;
+            }
+        }
+    }
+    return ocurance;
+}
 
+
+void removeOccurances(char** array, int size){
+    int i = 0;
+    while (i < size) {
+        if(howManyOccurances(array, size, array[i]) >= 2){
+            int j;
+            for(j = i; j < size; j++){
+                array[j] = array[j+1];
+            }
+            size--;
+        }
+        i++;
+    }
+    printf("Here's the new array with occurances removed\n");
+    printArray(array, size);
+}
+
+int my_strlen(char* aString){
+    int res = 0;
+    
+    do {
+        res++;
+    } while (aString[res] != '\0');
+    
+    return res;
+}
 

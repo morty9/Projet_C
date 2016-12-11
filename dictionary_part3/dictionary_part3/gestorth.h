@@ -45,7 +45,9 @@ int getMissingWordsLength(char* textFileName, char* dictioFile);
 int getClosedLength(char* aString, char* fileName);
 char** getCLosedWords(char* fileName, char* string, int);
 void displayCLosedWordsForEach(char**array, int size, char* fileName, char* dictionary);
-
+int howManyOccurances(char**, int,char*);
+void removeOccurances(char**, int);
+int my_strlen(char*);
 
 LinkedList* newElement(char*);
 void printLinkedList(LinkedList*);
