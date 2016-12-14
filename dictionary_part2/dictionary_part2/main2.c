@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "gestrech.h"
+#include "functions.h"
 
 int main(int argc, const char * argv[]) {
     

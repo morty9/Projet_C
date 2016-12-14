@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gestbib.h"
+#include "functions.h"
 
 int main(int argc, const char * argv[]) {
    

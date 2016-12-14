@@ -10,30 +10,20 @@
 #define gestbib_h
 
 #include <stdio.h>
+#include "functions.h"
 
-struct LinkedList{
-    char* value;
-    struct LinkedList* next;
-    
-};
-
-typedef struct LinkedList LinkedList;
-
-void menu(LinkedList*);
 void menu2(char*,LinkedList*);
-void createDictionary(LinkedList*);
-void searchWord(char*, LinkedList*);
-void displayDictionary(char*);
-void dictionaryList(LinkedList*);
-LinkedList* newElement(char*);
-void printLinkedList(LinkedList*);
-void chooseDictionary(LinkedList*);
+
 void addWords(char*, LinkedList*);
-int checkName(char*);
-void deleteDictionary(char*, LinkedList*);
-void deleteWord(char*);
-void chooseTextFile(char*, LinkedList*);
-void formattingFile(char*, char* , LinkedList* );
-void replaceCapital(char *);
+
+char* chooseTextFile(char*, LinkedList*);
+
+char* formattingFile(char*, char*, LinkedList*);
+
+void searchWord(char*, LinkedList*);
+
+char* removeOccurances(char*);
+
+int howManyOccurances(char**, int , char*);
 
 #endif /* gestbib_h */

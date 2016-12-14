@@ -13,216 +13,13 @@
 #include <dirent.h>
 #include <ctype.h>
 
-//menu() Main menu to choose for create a new dictionary or choose an existing dictionary
-void menu(LinkedList* dictionary, LinkedList* importFile) {
-    
-    
-    dictionaryListDir(dictionary);
-    dictionaryListDir(importFile);
-    
-    char* choice = malloc(sizeof(char));
-    
-    printf("-----------------------\nTHE DICTIONARY - PART 2\n-----------------------\nChoose an option (1 to 2)\n\n");
-    printf("1. Create new dictionary\n");
-    printf("2. Use an existing dictionary\n");
-    
-    do{
-        scanf("%s",choice);
-        
-        switch(*choice) {
-            case 49:
-                createDictionary(dictionary, importFile);
-                break;
-            case 50:
-                printLinkedList(dictionary);
-                chooseDictionary(dictionary, importFile);
-                break;
-            default:
-                printf("Invalid choice ! Please try again\n");
-                break;
-        }
-    }while(*choice != 49 && *choice != 50);
-    
-    free(choice);
-}
-
-
-//newElement() allows to create a new element in a linked list
-LinkedList* newElement(char* v){
-    LinkedList* ll = malloc(sizeof(LinkedList));
-    ll->value = v;
-    ll->next = NULL;
-    
-    return ll;
-}
-
-//printLinkedList() allows to display all the existing dictionary's
-void printLinkedList(LinkedList* ll){
-    
-    printf("\nHere are the dictionarys you can use\n");
-    
-    while(ll != NULL){
-        if(ll->value != NULL){
-            if(checkName(ll->value)){
-                printf("%s\n", ll->value);
-            }
-        }
-        ll = ll->next;
-    }
-}
-
-//checkName() allows to check if the needed file have ".txt" extension
-int checkName(char* astring){
-    
-    char dot = '.';
-    char* extension = ".txt";
-    
-    char* ret = strchr(astring, dot);
-    
-    if(ret != NULL && !strcmp(ret, extension)){
-        return 1;
-    }
-    else
-        return 0;
-}
-
-
-//dictionaList() put all dictionary's of the directory in a linked list
-void dictionaryListDir(LinkedList* dictionarys) {
-    
-    DIR* directory = opendir("./");
-    
-    if(directory != NULL) {
-        
-        struct dirent * content;
-        
-        while ((content = readdir(directory)) != NULL)
-        {
-            if(checkName(content->d_name)){
-                dictionarys->next = newElement(content->d_name);
-                dictionarys = dictionarys->next;
-            }
-        }
-        closedir(directory);
-    }else {
-        printf("Failed to open dictionary");
-    }
-}
-
-
-//createDictionary() allows to create a new dictionary
-void createDictionary(LinkedList* dictionarys, LinkedList* importFile){
-    
-    char* dictionaryName = malloc(sizeof(char)*255);
-    int create = 0;
-    //dictionaryList(dictionarys);
-    FILE* newDictionary = NULL;
-    
-    if(dictionarys->value == NULL) {
-        dictionarys = dictionarys->next;
-    }
-    
-    do {
-        printf("Enter a name for your new dictionary\n");
-        scanf("%s",dictionaryName);
-        
-        if(strcmp(dictionaryName, "\e") == 0) {
-            menu(dictionarys, importFile);
-        }
-        
-        strcat(dictionaryName, ".txt");
-        
-        if(dictionaryName != NULL){
-            
-            newDictionary = fopen(dictionaryName,"r+");
-            
-            if(newDictionary == NULL){
-                newDictionary = fopen(dictionaryName, "w");
-                dictionaryListDir(dictionarys);
-                create = 1;
-                printf("\nYour new dictionary has been succesfully created\n\n");
-                fclose(newDictionary);
-                //menu2(dictionaryName, dictionarys, importFile);
-            }else {
-                fclose(newDictionary);
-            }
-            
-        }else{
-            printf("Empty names are not allowed\n");
-        }
-        printf("This dictionary already exist, please retry\n");
-    }while(!create);
-    
-    free(dictionaryName);
-}
-
-
-//chooseDictionary() allows to choose an existing dictionary
-void chooseDictionary(LinkedList* dictionary, LinkedList* importFile) {
-    
-    char* name = malloc(sizeof(char)*255);
-    char* choice = malloc(sizeof(char));
-    
-    if(dictionary->value == NULL) {
-        dictionary = dictionary->next;
-    }
-    
-    int found = 0;
-    do {
-        LinkedList* head = dictionary;
-        printf("\nEnter the name of the dictionary you want to work on\n");
-        scanf("%s",name);
-        
-        if(strcmp(name,"\e") == 0) {
-            menu(dictionary, importFile);
-        }
-        
-        strcat(name, ".txt");
-        
-        while(head != NULL && head->value != NULL){
-            if(strcmp(name, head->value) == 0){
-                //menu2(name,head,importFile);
-                chooseTextFile(name, importFile, dictionary);
-                found = 1;
-                break;
-            }
-            head = head->next;
-        }
-        
-        do {
-            printf("This dictionary doesn't exist, would you like to create one ? y/n\n");
-            scanf("%s",choice);
-            switch (*choice) {
-                case 121:
-                    createDictionary(dictionary, importFile);
-                    break;
-                    
-                case 110:
-                    continue;
-                    break;
-                    
-                case 27:
-                    menu(dictionary,importFile);
-                    break;
-                    
-                default:
-                    printf("Wrong entry ! Please retry\n");
-                    break;
-            }
-        }while (*choice != 121 && *choice != 110 && *choice != 27);
-        
-    }while(!found);
-    
-    free(name);
-}
-
 
 //menu2() second menu linked to a dictionary (created or choosen)
-void menu2(char * import, char* dictionary , LinkedList* dictionaryList, LinkedList* importFile) {
+void menu2(char * import, char* dictionary , LinkedList* dictionaryList) {
     
     char* action = malloc(sizeof(char));
     
-    printf("\n--------\n  MENU\n--------\nChoose an option (1 to 7)\n\n");
+    printf("\n--------\n  MENU\n--------\nChoose an option (1 to 5)\n\n");
     printf("1. Display words of your dictionary\n");
     printf("2. Display missing words\n");
     printf("3. Display missing words and list of close words\n");
@@ -235,21 +32,21 @@ void menu2(char * import, char* dictionary , LinkedList* dictionaryList, LinkedL
         switch (*action) {
             case 49:
                 displayDictionary(dictionary);
-                menu2(import, dictionary, dictionaryList, importFile);
+                menu2(import, dictionary, dictionaryList);
                 break;
             case 50:
-                searchMissingWords(import, dictionary, dictionaryList, importFile);
-                menu2(import, dictionary, dictionaryList, importFile);
+                searchMissingWords(import, dictionary, dictionaryList);
+                menu2(import, dictionary, dictionaryList);
                 break;
             case 51:
-                searchMissingWordsAndTreshold(import, dictionary, dictionaryList, importFile);
-                menu2(import, dictionary, dictionaryList, importFile);
+                searchMissingWordsAndTreshold(import, dictionary, dictionaryList);
+                menu2(import, dictionary, dictionaryList);
                 break;
             case 52:
-                deleteDictionary(dictionary, import, dictionaryList, importFile);
+                deleteDictionary(dictionary, import, dictionaryList);
                 break;
             case 53:
-                menu(dictionaryList, importFile);
+                menu(dictionaryList);
                 break;
             default:
                 printf("Wrong entry ! Please retry\n");
@@ -259,134 +56,26 @@ void menu2(char * import, char* dictionary , LinkedList* dictionaryList, LinkedL
     
 }
 
-//displayDictionary() allows to display words of a dictionary (created or choosen)
-void displayDictionary(char* dictionaryName){
+//users choose a text file who want to import
+char* chooseTextFile(char* dictionary, LinkedList* dictionarys) {
     
-    printf("Dictionary name that you're working on is %s\n",dictionaryName);
-    
-    FILE* dictionary = fopen(dictionaryName,"r");
-    
-    char* current = malloc(sizeof(char)*255);
-    
-    if(dictionary){
-        
-        while(fgets(current, sizeof(current), dictionary)){
-            printf("%s",current);
-        }
-    }
-    else{
-        printf("The dictionary is not available\n");
-    }
-    
-    fclose(dictionary);
-    free(current);
-}
-
-//deleteDictionary() allows to delete a dictionary
-void deleteDictionary(char* name, char* import, LinkedList* dictionaryList, LinkedList* importFile) {
-    
-    char* choice = malloc(sizeof(char));
-    
-    FILE* dictionary = fopen(name,"w+");
-    
-    if(dictionary != NULL) {
-        
-        printf("\nAre you sure you want to delete %s y/n\n",name);
-        
-        do {
-            scanf("%s",choice);
-            
-            switch (*choice) {
-                case 121:
-                    remove(name);
-                    break;
-                    
-                case 110:
-                    menu2(name, import, dictionaryList, importFile);
-                    break;
-                    
-                case 27:
-                    menu2(name, import, dictionaryList, importFile);
-                    break;
-                    
-                default:
-                    printf("Wrong entry ! Please retry\n");
-                    break;
-            }
-        }while(*choice != 121 && *choice != 110 && *choice != 27);
-        
-        printf("\nThe dictionary %s has been deleted succesfully\n\n",name);
-        
-        menu(dictionaryList, importFile);
-        
-        fclose(dictionary);
-    }else {
-        printf("Error !");
-        menu(dictionaryList, importFile);
-        fclose(dictionary);
-    }
-}
-
-//convert capital letters in tiny letters
-void replaceCapital(char *string)
-{
-    int i = 0;
-    
-    for (i = 0; string[i] != '\0'; i ++)
-    {
-        if (string[i] >= 'A' && string[i] <= 'Z')
-        {
-            string[i] += 'a' - 'A';
-        }
-    }
-}
-
-//compare strings to find different caracter
-int my_strcmp(char* str1, char* str2) {
-    
-    int count = 0;
-    int i;
-    char* str = malloc(sizeof(char)*255);
-    
-    replaceCapital(str1);
-    replaceCapital(str2);
-    
-    if(strlen(str1) < strlen(str2)) {
-        str = str2;
-    }else {
-        str = str1;
-    }
-    
-    for (i = 0 ; str[i] != '\0' ; i ++) {
-        if(str1[i] != str2[i]) {
-            count++;
-        }
-    }
-    
-    return count;
-    
-}
-
-
-char* chooseTextFile(char* dictionary, LinkedList* importFile, LinkedList* dictionarys) {
-    
-    dictionaryListDir(importFile);
+    dictionaryListDir(dictionarys);
     
     char* name = malloc(sizeof(char)*255);
     char* newImportName = malloc(sizeof(char)*255);
     
-    if(importFile->value == NULL) {
-        importFile = importFile->next;
+    if(dictionarys->value == NULL) {
+        dictionarys = dictionarys->next;
     }
     
     int found = 0;
     do {
-        LinkedList* head = importFile;
+        LinkedList* head = dictionarys;
         printf("\nEnter the name of the file you want to import\n");
         scanf("%s",name);
         
         if(strcmp(name,"\e") == 0) {
-            menu(importFile, dictionarys);
+            menu(dictionarys);
         }
         
         strcat(name, ".txt");
@@ -394,7 +83,7 @@ char* chooseTextFile(char* dictionary, LinkedList* importFile, LinkedList* dicti
         while(head != NULL && head->value != NULL){
             if(strcmp(name, head->value) == 0){
                 found = 1;
-                newImportName = formattingFile(name, dictionary, importFile, dictionarys);
+                newImportName = formattingFile(name, dictionary, dictionarys);
                 break;
             }
             head = head->next;
@@ -410,28 +99,8 @@ char* chooseTextFile(char* dictionary, LinkedList* importFile, LinkedList* dicti
     return newImportName;
 }
 
-int fileLength(char* filename){
-    int result = 0;
-    FILE* file = fopen(filename,"r");
-    
-    char* word = malloc(sizeof(char)*255);
-    
-    if(file != NULL){
-        
-        while(fgets(word,255,file)){
-            result ++;
-        }
-        
-    }
-    
-    printf("Nombre de mots dans votre fichier: %d\n", result);
-    
-    free(word);
-    
-    return result;
-}
-
-char* formattingFile(char* name, char* dictionary,LinkedList* importFile, LinkedList* dictionarys) {
+//allow to formatting a file to transform him in dictionary
+char* formattingFile(char* name, char* dictionary, LinkedList* dictionarys) {
     
     FILE* import = fopen(name, "r+");
     FILE* importNew;
@@ -440,15 +109,14 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
     int i = 0;
     int create = 0;
     char * wordsToPut = malloc(sizeof(char)*255);
-    char** array;
-    int size = 0;
+    char*  fileName = malloc(sizeof(char)*255);
     
     do {
         printf("Enter a name for your new file\n");
         scanf("%s",importName);
         
         if(strcmp(importName, "\e") == 0) {
-            chooseTextFile(dictionary, importFile, dictionarys);
+            chooseTextFile(dictionary, dictionarys);
         }
         
         strcat(importName, ".txt");
@@ -479,6 +147,7 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
                 }
                 printf("You're file have been imported correctly\n");
                 fclose(importNew);
+                fclose(import);
             }else {
                 fclose(importNew);
                 fclose(import);
@@ -494,22 +163,17 @@ char* formattingFile(char* name, char* dictionary,LinkedList* importFile, Linked
         
     }while(!create);
     
-    fclose(import);
+    fileName = removeOccurances(importName);
+    menu2(fileName, dictionary, dictionarys);
     
-    //size = fileLength(importName);
-    //array = fillArray(importName, size);
-    
-    removeOccurances(importName);
-    
-    menu2(importName, dictionary, dictionarys, importFile);
     free(wordsToPut);
     free(importName);
     
     return importName;
 }
 
-
-char** searchMissingWords(char* name, char* dictionary, LinkedList* dictionaryList, LinkedList* importFile) {
+//allow to construct array of the file before the getMissingWords function
+char** searchMissingWords(char* name, char* dictionary, LinkedList* dictionaryList) {
     
     int dicoSize = fileLength(dictionary);
     int fileSize = fileLength(name);
@@ -522,7 +186,8 @@ char** searchMissingWords(char* name, char* dictionary, LinkedList* dictionaryLi
     return result;
 }
 
-void searchMissingWordsAndTreshold(char* import, char* dictionary, LinkedList* dictionaryList, LinkedList*importFile) {
+//allow to construct array of the file before the getMissingWordsWithThreshold function
+void searchMissingWordsAndTreshold(char* import, char* dictionary, LinkedList* dictionaryList) {
     
     int dicoSize = fileLength(dictionary);
     int fileSize = fileLength(import);
@@ -536,37 +201,7 @@ void searchMissingWordsAndTreshold(char* import, char* dictionary, LinkedList* d
     
 }
 
-char** fillArray(char* filename,int size){
-    
-    char** array = malloc(sizeof(char*)*size);
-    
-    FILE* file = fopen(filename,"r");
-    
-    if(file != NULL){
-        char* wordFromFile = malloc(sizeof(char)*255);
-        int i = 0;
-        while (fgets(wordFromFile,255,file)) {
-            
-            wordFromFile[strcspn(wordFromFile, "\n")] = '\0';
-            
-            
-            if(i < size){
-                array[i] = malloc(sizeof(char)*255);
-                strcpy(array[i],wordFromFile);
-            }
-            i++;
-        }
-        free(wordFromFile);
-        fclose(file);
-    }else {
-        printf("Erreur file\n");
-        fclose(file);
-    }
-    
-    return array;
-}
-
-
+//get missing words of file
 char** getMissingWords(char** arrayText, int textFileSize, char** arrayDictio, int dictioSize){
     
     int line = 0;
@@ -586,24 +221,10 @@ char** getMissingWords(char** arrayText, int textFileSize, char** arrayDictio, i
         i++;
     }
     
-    for(int i = 0; result[i]; i++) {
-        printf("%s\n",result[i]);
-    }
-    
     return result;
 }
 
-
-void printArray(char**array, int size){
-    
-    int i = 0;
-    
-    for(i = 0; i < size; i++){
-        printf("%s\n",array[i]);
-    }
-    
-}
-
+//get missing words of file with a threshold
 void missingWordsWithThreshold(char** arrayText, int textFileSize, char** arrayDictio, int dictioSize, char* import, char* dictionary){
 
     int size = 0;
@@ -613,11 +234,6 @@ void missingWordsWithThreshold(char** arrayText, int textFileSize, char** arrayD
     arrayMissing = getMissingWords(arrayText, textFileSize, arrayDictio, dictioSize);
     
     for (i = 0; arrayMissing[i] ; i++) {
-        printf("%s\n",arrayMissing[i]);
-        
-    }
-    
-    for (i = 0; arrayMissing[i] ; i++) {
         size++;
     }
 
@@ -625,55 +241,78 @@ void missingWordsWithThreshold(char** arrayText, int textFileSize, char** arrayD
     
 }
 
-
+//display closed words between each string and dictionary
 void displayCLosedWordsForEach(char**array, int size, char* fileName, char* dictionary){
     
-    FILE* file = fopen(fileName,"r+");
-    FILE* correction = fopen("correction.txt", "a+");
-    
-    int j = 0;
     int nbrOfClosedWords = 0;
     char* words = malloc(sizeof(char)*255);
-    int s = 0;
     
     printf("\n\nList of closed words for each missing word\n\n");
     
     for(int i = 0; i < size; i++){
-        
+        int sizeRes = 0;
         nbrOfClosedWords = getClosedLength(array[i], dictionary);
         if(nbrOfClosedWords){
-            char** res = getCLosedWords(dictionary,array[i], nbrOfClosedWords);
-            printf("\n\nThe closed words for %s are : \n", array[i]);
+            char** res = getCLosedWords(dictionary,array[i], nbrOfClosedWords, &sizeRes);
+            printf("\n\nThe closed words for '%s' are : \n", array[i]);
             printArray(res, nbrOfClosedWords);
-            if(file && correction) {
-                while(fgets(words, 255, file) != '\0') {
-                    s += strlen(words);
-                    words[strcspn(words, "\n")] = '\0';
-                    if(strcmp(words, array[i]) == 0) {
-                        file = fopen(fileName, "a+");
-                        fseek(file, s, SEEK_SET);
-                        for (int j = 0; res[j] ; j++) {
-                            if(my_strcmp(words, res[j]) == 1) {
-                                fputs(res[j], file);
-                            }
-                        }
-                    }
-                    fseek(file, 0, SEEK_SET);
-                }
+            char * thresholdArray = correctFile(res, array[i], fileName, sizeRes);
+            if(thresholdArray != NULL) {
+                array[i] = thresholdArray;
             }
-            //fputs(res[j],correction);
         }else {
             printf("No closed words for %s\n",array[i]);
         }
 
     }
     
+    newFileCorrected(fileName, array, size);
+    
     free(words);
 }
 
+//take closed words array, the more closed words of a string
+char* correctFile(char** res, char* array, char* fileName, int sizeRes) {
+    
+    int j;
+    char* thresholdArray = malloc(sizeof(char));
+    
+    for(j = 0; j < sizeRes ; j++) {
+        if(res[j] == NULL || res[j] == '\0') {
+            continue;
+        }
+        if(array != '\0' && res[j] != '\0' && array != NULL && res[j] != NULL && my_strcmp(array, res[j]) <= 1) {
+            thresholdArray = res[j];
+            printf("\n\n%s\n",thresholdArray);
+            return thresholdArray;
+        }
+    }
 
+    thresholdArray = res[0];
+    return thresholdArray;
+}
 
-char** getCLosedWords(char* fileName, char* string, int nbrOfClosedWords){
+//create a file with the corrected words
+void newFileCorrected(char* filename, char** array, int size) {
+    
+    FILE* correctFile = fopen(filename,"w+");
+    int i;
+    
+    if(correctFile) {
+        for(i = 0; i < size ; i++) {
+            array[i][strcspn(array[i], "\n")] = '\0';
+            fputs(array[i], correctFile);
+            fputs("\n", correctFile);
+        }
+        fclose(correctFile);
+    }else {
+        fclose(correctFile);
+    }
+    
+}
+
+//get closed words between a string and a dictionary
+char** getCLosedWords(char* fileName, char* string, int nbrOfClosedWords, int* sizeRes){
     
     char** result = malloc(sizeof(char*) * nbrOfClosedWords);
     
@@ -687,15 +326,18 @@ char** getCLosedWords(char* fileName, char* string, int nbrOfClosedWords){
             if(my_strcmp(wordFromFile, string) <= 2) {
                 result[i] = malloc(sizeof(char)*255);
                 strcpy(result[i], wordFromFile);
+                (*sizeRes)++;
                 i++;
             }
         }
+        fclose(file);
+    }else {
         fclose(file);
     }
     return result;
 }
 
-
+//get number of closed words between a string and a dictionary
 int getClosedLength(char* aString, char* fileName){
     
     int closedWords = 0;
@@ -712,10 +354,13 @@ int getClosedLength(char* aString, char* fileName){
             }
         }
         fclose(file);
+    }else {
+        fclose(file);
     }
     return closedWords;
 }
 
+//calculate occurences in array
 int howManyOccurances(char** array, int size,char* string){
     int ocurance = 0;
     int i;
@@ -747,8 +392,8 @@ int howManyOccurances(char** array, int size,char* string){
 }
 
 
-
-void removeOccurances(char* filename){
+//removes occurences in array
+char* removeOccurances(char* filename){
     
     int fileSize = fileLength(filename);
     
@@ -766,25 +411,17 @@ void removeOccurances(char* filename){
         i++;
     }
     
-    printf("Here's the new array with occurances removed\n");
-    printArray(array, fileSize);
-    
     FILE* file = fopen(filename, "w+");
     if(file){
         for(int j = 0; j < fileSize; j++){
             fputs(array[j], file);
             fputs("\n", file);
         }
+        fclose(file);
+    }else {
+        fclose(file);
     }
-}
-
-int my_strlen(char* aString){
-    int res = 0;
     
-    do {
-        res++;
-    } while (aString[res] != '\0');
-    
-    return res;
+    return filename;
 }
 
