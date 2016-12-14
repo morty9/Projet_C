@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		08816DFD1DFC117400D6BFF2 /* main1.c in Sources */ = {isa = PBXBuildFile; fileRef = 08816DFC1DFC117400D6BFF2 /* main1.c */; };
 		08816E051DFC11D900D6BFF2 /* gestbib.c in Sources */ = {isa = PBXBuildFile; fileRef = 08816E031DFC11D900D6BFF2 /* gestbib.c */; };
+		08816EC61E00BDF100D6BFF2 /* functions.c in Sources */ = {isa = PBXBuildFile; fileRef = 08816EC41E00BDF100D6BFF2 /* functions.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,8 @@
 		08816DFC1DFC117400D6BFF2 /* main1.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main1.c; sourceTree = "<group>"; };
 		08816E031DFC11D900D6BFF2 /* gestbib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gestbib.c; sourceTree = "<group>"; };
 		08816E041DFC11D900D6BFF2 /* gestbib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gestbib.h; sourceTree = "<group>"; };
+		08816EC41E00BDF100D6BFF2 /* functions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = functions.c; sourceTree = "<group>"; };
+		08816EC51E00BDF100D6BFF2 /* functions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = functions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,8 @@
 				08816DFC1DFC117400D6BFF2 /* main1.c */,
 				08816E031DFC11D900D6BFF2 /* gestbib.c */,
 				08816E041DFC11D900D6BFF2 /* gestbib.h */,
+				08816EC41E00BDF100D6BFF2 /* functions.c */,
+				08816EC51E00BDF100D6BFF2 /* functions.h */,
 			);
 			path = dictionary_part1;
 			sourceTree = "<group>";
@@ -125,6 +130,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				08816E051DFC11D900D6BFF2 /* gestbib.c in Sources */,
+				08816EC61E00BDF100D6BFF2 /* functions.c in Sources */,
 				08816DFD1DFC117400D6BFF2 /* main1.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -252,6 +258,7 @@
 				08816E021DFC117400D6BFF2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

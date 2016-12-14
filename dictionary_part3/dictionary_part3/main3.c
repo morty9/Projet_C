@@ -8,13 +8,13 @@
 
 #include <stdio.h>
 #include "gestorth.h"
+#include "functions.h"
 
 int main(int argc, const char * argv[]) {
     
     LinkedList* dictionarys = newElement(NULL);
-    LinkedList* importFiles = newElement(NULL);
     
-    menu(dictionarys, importFiles);
+    menu(dictionarys);
     
     //mainMenu();
     
